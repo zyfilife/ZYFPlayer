@@ -91,11 +91,15 @@ class MYLoadingView: UIView {
     }
     
     override func draw(_ rect: CGRect) {
-        let context = UIGraphicsGetCurrentContext()
-        context?.setLineWidth(self.lineWidth)
-        context?.setStrokeColor(self.lineColor.cgColor)
-        context?.addArc(center: CGPoint(x: self.bounds.width/2, y: self.bounds.height/2), radius: self.bounds.width/2-self.lineWidth, startAngle: self.toAngle(angle: 120), endAngle: self.toAngle(angle: 120)+self.toAngle(angle: 330*self.anglePer), clockwise: false)
-        context?.strokePath()
+        guard let context = UIGraphicsGetCurrentContext() else {
+            return
+        }
+        context.setLineWidth(self.lineWidth)
+        context.setStrokeColor(self.lineColor.cgColor)
+        context.setLineCap(CGLineCap.round)
+        context.setLineJoin(CGLineJoin.bevel)
+        context.addArc(center: CGPoint(x: self.bounds.width/2, y: self.bounds.height/2), radius: self.bounds.width/2-self.lineWidth, startAngle: self.toAngle(angle: 120), endAngle: self.toAngle(angle: 120)+self.toAngle(angle: 330*self.anglePer), clockwise: false)
+        context.strokePath()
     }
     
     fileprivate func toAngle(angle: CGFloat) -> CGFloat {
