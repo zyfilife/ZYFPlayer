@@ -114,7 +114,7 @@ fileprivate let kPlayerLikelyTokeepUpKey = "playbackLikelyToKeepUp"
 fileprivate let kPlayerLoadedTimeRangesKey = "loadedTimeRanges"
 
 // time out
-fileprivate let kPlayerTimeOut: TimeInterval = 60
+fileprivate let kPlayerTimeOut: TimeInterval = 20
 
 @objc protocol MYPlayerDelegate: NSObjectProtocol {
     //播放状态
@@ -157,7 +157,7 @@ class MYPlayer: NSObject {
         }
     }
     
-    fileprivate var track: MYPlayerTrack! {
+    var track: MYPlayerTrack! {
         didSet {
             self.playerItem = nil
             self.avPlayer = nil
@@ -291,18 +291,15 @@ class MYPlayer: NSObject {
     
     var state: MYPlayerState = .unkown {
         didSet {
-            self.myLog(string: "currentState", item: self.state)
             guard let delegate = self.delegate else {
                 return
             }
             if delegate.responds(to: #selector(MYPlayerDelegate.my_player(player:shouldChangeToState:))) {
                 if !delegate.my_player!(player: self, shouldChangeToState: oldValue) {
-                    self.myLog(string: "shouldChangeToState", item: false)
                     return
                 }
             }
             delegate.my_player?(player: self, track: self.track, willChangeToState: self.state, fromState: oldValue)
-            self.myLog(string: "willChangeToState", item: self.state)
             if oldValue == self.state {
                 if !self.isPlaying && self.state == .playing {
                     self.avPlayer?.play()
@@ -312,11 +309,11 @@ class MYPlayer: NSObject {
             
             switch oldValue {
             case .loading:
-                NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(MYPlayer.urlAssetTimeOut(_:)), object: oldValue)
+                NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(MYPlayer.urlAssetTimeOut), object: nil)
             case .seeking:
-                NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(MYPlayer.seekingTimeOut(_:)), object: oldValue)
+                NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(MYPlayer.seekingTimeOut), object: nil)
             case .buffering:
-                NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(MYPlayer.bufferingTimeOut(_:)), object: oldValue)
+                NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(MYPlayer.bufferingTimeOut), object: nil)
             case .stopped:
                 if self.state == .playing {
                     return
@@ -332,10 +329,14 @@ class MYPlayer: NSObject {
                 }
             case .loading:
                 self.perform(#selector(MYPlayer.urlAssetTimeOut), with: nil, afterDelay: kPlayerTimeOut)
+                break
             case .readToPlay:
                 self.track.hasVideoBeenLoadedBefore = true
             case .seeking:
                 self.perform(#selector(MYPlayer.seekingTimeOut), with: nil, afterDelay: kPlayerTimeOut)
+                break
+            case .buffering:
+                self.perform(#selector(MYPlayer.bufferingTimeOut), with: nil, afterDelay: kPlayerTimeOut)
             case .playing:
                 if !self.isPlaying{
                     self.avPlayer?.play()
@@ -350,13 +351,14 @@ class MYPlayer: NSObject {
                 self.cancelAllTimeOut()
                 self.playerItem?.cancelPendingSeeks()
                 self.avPlayer?.pause()
+                self.asset.cancelLoading()
                 self.saveLastWatchTimeWithOldState(oldState: oldValue)
                 self.releasePlayer()
             default:
                 break
             }
+            self.myLog(string: "currentState", item: self.state)
             self.delegate?.my_player?(player: self, track: self.track, didChangeToState: self.state, fromState: oldValue)
-            self.myLog(string: "didChangeToState", item: self.state)
         }
     }
     
@@ -372,7 +374,7 @@ class MYPlayer: NSObject {
     }
     
     deinit {
-        self.delegate = nil
+        print("\(self.classForCoder)已销毁")
         self.releasePlayer()
         self.removeRouteObservers()
     }
@@ -398,11 +400,28 @@ extension MYPlayer {
         self.reloadVideoTrack(track: track)
     }
     
-    fileprivate func reloadVideoTrack(track: MYPlayerTrack) {
+    func reloadVideoTrack(track: MYPlayerTrack) {
         self.state = .requestURL
         switch self.state {
         case .requestURL:
             self.playWithTrack(track: track)
+        default:
+            break
+        }
+    }
+    
+    func reloadCurrentVideoTrack() {
+        if !self.track.isPlayedToEnd && self.track.continueToWatchInLastTime && self.track.hasVideoBeenLoadedBefore {
+            self.saveLastWatchTimeWithOldState(oldState: self.state)
+        }
+
+        switch self.state {
+        case .buffering, .loading, .requestURL, .seeking, .paused, .stopped, .failed:
+            self.reloadVideoTrack(track: self.track)
+        case .playing:
+            self.pauseContentCompletion(completion: { 
+                self.reloadVideoTrack(track: self.track)
+            })
         default:
             break
         }
@@ -429,10 +448,8 @@ extension MYPlayer {
         if self.state == .stopped {
             return
         }
-        self.myLog(string: "playVideoWithStreamURL", item: streamURL)
         self.track.streamURL = streamURL
         self.state = .loading
-        
         self.willPlayTrack(track: self.track)
         self.asynLoadURLAssetWithStreamURL(streamURL: streamURL)
     }
@@ -452,21 +469,24 @@ extension MYPlayer {
                 let status = self.asset.statusOfValue(forKey: kPlayerTracksKey, error: &error)
                 
                 if status == .loading {
-                    self.myLog(string: "asset.status", item: "loading")
                 }else if status == .loaded {
-                    self.myLog(string: "asset.status", item: "loaded")
                     let duration: TimeInterval = CMTimeGetSeconds(self.asset.duration)
-                    self.track.videoDuration = duration
+                    self.track.totalTime = duration
                     if streamURL.isFileURL {
-                        self.track.videoType = .local
+                        self.track.resourceType = .local
                     }else if duration == 0 || duration.isNaN {
-                        self.track.videoType = .live
-                        self.track.videoDuration = 0
+                        self.track.resourceType = .live
+                        self.track.totalTime = 0
                     }else {
-                        self.track.videoType = .vod
+                        self.track.resourceType = .vod
                     }
-                    
                     self.playerItem = AVPlayerItem(asset: self.asset)
+                    if self.track.lastTimeInSeconds > self.track.totalTime {
+                        self.track.lastTimeInSeconds = 0
+                    }
+                    if self.track.continueToWatchInLastTime && self.track.lastTimeInSeconds > 0 && self.track.resourceType != .live {
+                        self.playerItem?.seek(to: CMTime(seconds: self.track.lastTimeInSeconds, preferredTimescale: self.playerItem!.currentTime().timescale))
+                    }
                     self.avPlayer = AVPlayer(playerItem: self.playerItem)
                     if self.playerLayerView != nil {
                         self.playerLayerView?.playerLayer.player = self.avPlayer
@@ -569,7 +589,6 @@ extension MYPlayer {
         }
         self.state = .seeking
         self.seekToTimeInSecond(tiem: time) { (finished) in
-            print("finished:\(finished), time:\(time)")
             completion?(finished)
             self.playContent()
             
@@ -614,29 +633,23 @@ extension MYPlayer {
     }
     
     func releasePlayer() {
-        self.avPlayer = nil
         self.playerItem = nil
+        self.avPlayer = nil
     }
 }
 
 // MARK: - Time Out
 extension MYPlayer {
-    @objc fileprivate func urlAssetTimeOut(_ oldState: MYPlayerState) {
-        if oldState == .loading {
-            self.notifyTimeOut(timeOut: MYPlayerTimeOut.load)
-        }
+    @objc fileprivate func urlAssetTimeOut() {
+        self.notifyTimeOut(timeOut: MYPlayerTimeOut.load)
     }
     
-    @objc fileprivate func seekingTimeOut(_ oldState: MYPlayerState) {
-        if oldState == .seeking {
-            self.notifyTimeOut(timeOut: MYPlayerTimeOut.seek)
-        }
+    @objc fileprivate func seekingTimeOut() {
+        self.notifyTimeOut(timeOut: MYPlayerTimeOut.seek)
     }
     
-    @objc fileprivate func bufferingTimeOut(_ oldState: MYPlayerState) {
-        if oldState == .buffering {
-            self.notifyTimeOut(timeOut: MYPlayerTimeOut.buffer)
-        }
+    @objc fileprivate func bufferingTimeOut() {
+        self.notifyTimeOut(timeOut: MYPlayerTimeOut.buffer)
     }
     
     @objc fileprivate func notifyTimeOut(timeOut: MYPlayerTimeOut) {
@@ -657,9 +670,9 @@ extension MYPlayer {
     }
     
     fileprivate func cancelAllTimeOut() {
-        NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(MYPlayer.urlAssetTimeOut(_:)), object: self.state)
-        NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(MYPlayer.seekingTimeOut(_:)), object: self.state)
-        NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(MYPlayer.bufferingTimeOut(_:)), object: self.state)
+        NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(MYPlayer.urlAssetTimeOut), object: nil)
+        NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(MYPlayer.seekingTimeOut), object: nil)
+        NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(MYPlayer.bufferingTimeOut), object: nil)
     }
 }
 
@@ -692,14 +705,12 @@ extension MYPlayer {
             guard let strongSelf = self else {
                 return
             }
-            
             let timeInSeconds: TimeInterval = CMTimeGetSeconds(time)
             if timeInSeconds <= 0 {
                 return
             }
             if strongSelf.state == .playing {
-                
-                strongSelf.track.videoTime = timeInSeconds
+                strongSelf.track.currentTime = timeInSeconds
                 strongSelf.delegate?.my_player?(player: strongSelf, track: strongSelf.track, didUpdateCurrentTime: timeInSeconds)
             }
         })
@@ -734,6 +745,7 @@ extension MYPlayer {
                 case .some(.readyToPlay):
                     self.state = .readToPlay
                 case .some(.failed):
+                    self.state = .failed
                     self.notifyErrorCode(errorCode: MYPlayerErrorCode.playerFail, error: self.avPlayer?.error)
                 default:
                     break
@@ -744,7 +756,7 @@ extension MYPlayer {
                 return
             }
             if keyPath == kPlayerBufferEmptyKey {
-                let isBufferEmpty = self.currentTime > 0 && (self.currentTime < self.maximumDuration - 1 || self.track.videoType == .live)
+                let isBufferEmpty = self.currentTime > 0 && (self.currentTime < self.maximumDuration - 1 || self.track.resourceType == .live)
                 if playerItem.isPlaybackBufferEmpty && isBufferEmpty && (self.state == .playing || self.state == .seeking) {
                     self.state = .buffering
                 }
@@ -814,6 +826,6 @@ extension MYPlayer {
 
 extension MYPlayer {
     func myLog(string: String, item: Any) {
-        print("************\(string):\n************\(item)")
+        print("************************  \(string):  \(item)")
     }
 }

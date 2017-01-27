@@ -137,9 +137,13 @@ class MYPlayerBottomView: UIView {
         return slider
     }()
     
+    lazy var backgroundView: UIImageView = {
+        return UIImageView(image: UIImage.my_image(named: "bottom_shadow"))
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.backgroundColor = UIColor(white: 0, alpha: 0.7)
+        self.addSubview(self.backgroundView)
         self.addSubview(self.currentTimeLabel)
         self.addSubview(self.totalTimeLabel)
         self.addSubview(self.playButton)
@@ -150,7 +154,7 @@ class MYPlayerBottomView: UIView {
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        self.backgroundColor = UIColor(white: 0, alpha: 0.7)
+        self.addSubview(self.backgroundView)
         self.addSubview(self.currentTimeLabel)
         self.addSubview(self.totalTimeLabel)
         self.addSubview(self.playButton)
@@ -159,8 +163,13 @@ class MYPlayerBottomView: UIView {
         self.addSubview(self.progressSlider)
     }
     
+    deinit {
+        print("\(self.classForCoder)已销毁")
+    }
+    
     override func layoutSubviews() {
         super.layoutSubviews()
+        self.backgroundView.frame = self.bounds
         self.playButton.frame = CGRect(x: 0, y: 0, width: 50, height: 50)
         self.playButton.center.y = self.frame.size.height/2
         
@@ -184,34 +193,23 @@ class MYPlayerBottomView: UIView {
     }
     
     func clickFullScreenButtonAction(_ sender: UIButton) {
-        self.isFullScreen = !self.isFullScreen
         self.didClickFullScreenButtonActionHandler?(sender)
     }
     
     func sliderTouchDownAction(_ sender: UISlider) {
-        print("sliderTouchDownAction")
         self.didStartDragSliderActionHandler?(sender)
     }
     
     func sliderDragAction(_ sender: UISlider) {
-        print("sliderDragAction")
         self.didDragingSliderActionHandler?(sender)
     }
     
     func sliderTouchUpAction(_ sender: UISlider) {
-        print("sliderTouchUpAction")
         self.didEndDragSliderActionHandler?(sender)
     }
     
     func clickProgressSliderAction(_ sender: UITapGestureRecognizer) {
-//        if !self.isDraging {
-//            
-//        }
-//        self.isDraging = false
-        print("clickProgressSliderAction")
         let point = sender.location(in: self.progressSlider)
-        print(point)
-        
         let progress = point.x / self.progressSlider.frame.size.width
         self.didTouchSliderActionHandler?(Float(progress))
     }

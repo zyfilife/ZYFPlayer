@@ -8,7 +8,7 @@
 
 import UIKit
 
-enum MYPlayerTrackType: Int {
+enum MYPlayerResourceType: Int {
     case vod = 0
     case live
     case local
@@ -16,19 +16,22 @@ enum MYPlayerTrackType: Int {
 
 class MYPlayerTrack: NSObject {
     
-    var videoType: MYPlayerTrackType = .vod
+    var resourceType: MYPlayerResourceType = .vod
     var streamURL: URL
     var isPlayedToEnd = false
-    
     var hasVideoBeenLoadedBefore = false
-    var videoTime: TimeInterval = 0
-    var videoDuration: TimeInterval = 0
-    var continueLastWatchTime = false
+    var currentTime: TimeInterval = 0
+    var totalTime: TimeInterval = 0
+    var continueToWatchInLastTime = false
     var lastTimeInSeconds: TimeInterval = 0
     
     init(streamURL: URL) {
         self.streamURL = streamURL
         super.init()
+    }
+    
+    deinit {
+        print("\(self.classForCoder)已销毁")
     }
     
     func getStreamURL(completed: (_ url: URL)-> Void) {
@@ -38,7 +41,7 @@ class MYPlayerTrack: NSObject {
     func resetTrack() {
         self.isPlayedToEnd = false
         self.hasVideoBeenLoadedBefore = false
-        self.continueLastWatchTime = false
+        self.continueToWatchInLastTime = false
         self.lastTimeInSeconds = 0
     }
 }

@@ -19,6 +19,9 @@
 		40277C341E376956004EC54A /* MYPlayerBottomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40277C331E376956004EC54A /* MYPlayerBottomView.swift */; };
 		40277C5C1E376FDB004EC54A /* MYPlayer.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 40277C5B1E376FDB004EC54A /* MYPlayer.bundle */; };
 		40277C5F1E38657F004EC54A /* MYLoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40277C5E1E38657F004EC54A /* MYLoadingView.swift */; };
+		40EBF7B41E39E5570058D849 /* MYPlayerTopView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40EBF7B31E39E5570058D849 /* MYPlayerTopView.swift */; };
+		40EBF7B61E39F4220058D849 /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40EBF7B51E39F4220058D849 /* TableViewController.swift */; };
+		40EBF7B81E3A18AA0058D849 /* MYPlayerErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40EBF7B71E3A18AA0058D849 /* MYPlayerErrorView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +39,9 @@
 		40277C331E376956004EC54A /* MYPlayerBottomView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MYPlayerBottomView.swift; sourceTree = "<group>"; };
 		40277C5B1E376FDB004EC54A /* MYPlayer.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = MYPlayer.bundle; sourceTree = "<group>"; };
 		40277C5E1E38657F004EC54A /* MYLoadingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MYLoadingView.swift; sourceTree = "<group>"; };
+		40EBF7B31E39E5570058D849 /* MYPlayerTopView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MYPlayerTopView.swift; sourceTree = "<group>"; };
+		40EBF7B51E39F4220058D849 /* TableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
+		40EBF7B71E3A18AA0058D849 /* MYPlayerErrorView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MYPlayerErrorView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +76,7 @@
 			children = (
 				40277C161E372B0A004EC54A /* AppDelegate.swift */,
 				40277C181E372B0A004EC54A /* ViewController.swift */,
+				40EBF7B51E39F4220058D849 /* TableViewController.swift */,
 				40277C1A1E372B0A004EC54A /* Main.storyboard */,
 				40277C1D1E372B0A004EC54A /* Assets.xcassets */,
 				40277C1F1E372B0A004EC54A /* LaunchScreen.storyboard */,
@@ -89,6 +96,8 @@
 				40277C2F1E3752CD004EC54A /* MYPlayerLayerView.swift */,
 				40277C311E375A84004EC54A /* MYPlayerView.swift */,
 				40277C331E376956004EC54A /* MYPlayerBottomView.swift */,
+				40EBF7B31E39E5570058D849 /* MYPlayerTopView.swift */,
+				40EBF7B71E3A18AA0058D849 /* MYPlayerErrorView.swift */,
 			);
 			path = MYPlayer;
 			sourceTree = "<group>";
@@ -178,9 +187,12 @@
 				40277C301E3752CD004EC54A /* MYPlayerLayerView.swift in Sources */,
 				40277C191E372B0A004EC54A /* ViewController.swift in Sources */,
 				40277C2B1E372C5B004EC54A /* MYPlayer.swift in Sources */,
+				40EBF7B81E3A18AA0058D849 /* MYPlayerErrorView.swift in Sources */,
+				40EBF7B61E39F4220058D849 /* TableViewController.swift in Sources */,
 				40277C2E1E372F2F004EC54A /* MYPlayerTrack.swift in Sources */,
 				40277C341E376956004EC54A /* MYPlayerBottomView.swift in Sources */,
 				40277C5F1E38657F004EC54A /* MYLoadingView.swift in Sources */,
+				40EBF7B41E39E5570058D849 /* MYPlayerTopView.swift in Sources */,
 				40277C171E372B0A004EC54A /* AppDelegate.swift in Sources */,
 				40277C321E375A84004EC54A /* MYPlayerView.swift in Sources */,
 			);
@@ -307,6 +319,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = 6PV3E3Y4LF;
 				INFOPLIST_FILE = MYPlayerDemo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.zhuyifeng.MYPlayerDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -320,6 +333,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = 6PV3E3Y4LF;
 				INFOPLIST_FILE = MYPlayerDemo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.zhuyifeng.MYPlayerDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -346,6 +360,7 @@
 				40277C271E372B0A004EC54A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

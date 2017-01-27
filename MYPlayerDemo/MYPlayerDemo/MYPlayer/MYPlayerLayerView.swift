@@ -28,4 +28,8 @@ class MYPlayerLayerView: UIView {
     override static var layerClass: AnyClass {
         return AVPlayerLayer.self
     }
+    
+    deinit {
+        print("\(self.classForCoder)已销毁")
+    }
 }
