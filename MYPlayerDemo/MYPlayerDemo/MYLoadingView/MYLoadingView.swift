@@ -30,7 +30,6 @@ class MYLoadingView: UIView {
                 self.displayerLink?.invalidate()
                 self.displayerLink = nil
             }
-            self.displayerLink = newValue
         }
     }
     
