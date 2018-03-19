@@ -1,6 +1,6 @@
 //
-//  MYPlayer.swift
-//  MYVideoPlayer
+//  ZYFPlayer.swift
+//  ZYFPlayerExample
 //
 //  Created by 朱益锋 on 2017/1/15.
 //  Copyright © 2017年 朱益锋. All rights reserved.
@@ -10,7 +10,7 @@ import UIKit
 import AVKit
 import AVFoundation
 
-@objc enum MYPlayerErrorCode: Int, CustomStringConvertible {
+@objc enum ZYFPlayerErrorCode: Int, CustomStringConvertible {
     case videoBlocked = 900
     case fetchStreamError
     case streamNotFound
@@ -45,7 +45,7 @@ import AVFoundation
     }
 }
 
-@objc enum MYPlayerTimeOut: Int, CustomStringConvertible {
+@objc enum ZYFPlayerTimeOut: Int, CustomStringConvertible {
     case load = 0
     case seek
     case buffer
@@ -62,7 +62,7 @@ import AVFoundation
     }
 }
 
-@objc enum MYPlayerState: Int, CustomStringConvertible {
+@objc enum ZYFPlayerState: Int, CustomStringConvertible {
     case unkown = 0
     case requestURL
     case loading
@@ -98,8 +98,6 @@ import AVFoundation
             return "failed"
         }
     }
-    
-    
 }
 
 // player KVO
@@ -116,21 +114,21 @@ fileprivate let kPlayerLoadedTimeRangesKey = "loadedTimeRanges"
 // time out
 fileprivate let kPlayerTimeOut: TimeInterval = 20
 
-@objc protocol MYPlayerDelegate: NSObjectProtocol {
+@objc protocol ZYFPlayerDelegate: NSObjectProtocol {
     //播放状态
-    @objc optional func my_player(player: MYPlayer, shouldPlayTrack track: MYPlayerTrack) -> Bool
-    @objc optional func my_player(player: MYPlayer, willPlayTrack track: MYPlayerTrack)
-    @objc optional func my_player(player: MYPlayer, didEndToPlayTrack track: MYPlayerTrack)
-    @objc optional func my_player(player: MYPlayer, shouldChangeToState toState: MYPlayerState) -> Bool
-    @objc optional func my_player(player: MYPlayer, track: MYPlayerTrack, willChangeToState toState: MYPlayerState, fromState: MYPlayerState)
-    @objc optional func my_player(player: MYPlayer, track: MYPlayerTrack, didChangeToState toState: MYPlayerState, fromState: MYPlayerState)
-    @objc optional func my_player(player: MYPlayer, track: MYPlayerTrack, didUpdateCurrentTime currentTime: TimeInterval)
-    @objc optional func my_player(player: MYPlayer, track: MYPlayerTrack, didUpdateBufferTime bufferTime: TimeInterval)
-    @objc optional func my_player(player: MYPlayer, track: MYPlayerTrack, receivedTimeout timeOut: MYPlayerTimeOut)
-    @objc optional func my_player(player: MYPlayer, track: MYPlayerTrack, receivedErrorCode errorCode: MYPlayerErrorCode, error: Error?)
+    @objc optional func zyf_player(player: ZYFPlayer, shouldPlayTrack track: ZYFPlayerTrack) -> Bool
+    @objc optional func zyf_player(player: ZYFPlayer, willPlayTrack track: ZYFPlayerTrack)
+    @objc optional func zyf_player(player: ZYFPlayer, didEndToPlayTrack track: ZYFPlayerTrack)
+    @objc optional func zyf_player(player: ZYFPlayer, shouldChangeToState toState: ZYFPlayerState) -> Bool
+    @objc optional func zyf_player(player: ZYFPlayer, track: ZYFPlayerTrack, willChangeToState toState: ZYFPlayerState, fromState: ZYFPlayerState)
+    @objc optional func zyf_player(player: ZYFPlayer, track: ZYFPlayerTrack, didChangeToState toState: ZYFPlayerState, fromState: ZYFPlayerState)
+    @objc optional func zyf_player(player: ZYFPlayer, track: ZYFPlayerTrack, didUpdateCurrentTime currentTime: TimeInterval)
+    @objc optional func zyf_player(player: ZYFPlayer, track: ZYFPlayerTrack, didUpdateBufferTime bufferTime: TimeInterval)
+    @objc optional func zyf_player(player: ZYFPlayer, track: ZYFPlayerTrack, receivedTimeout timeOut: ZYFPlayerTimeOut)
+    @objc optional func zyf_player(player: ZYFPlayer, track: ZYFPlayerTrack, receivedErrorCode errorCode: ZYFPlayerErrorCode, error: Error?)
 }
 
-class MYPlayer: NSObject {
+class ZYFPlayer: NSObject {
     
     fileprivate var asset: AVURLAsset!
     
@@ -157,14 +155,14 @@ class MYPlayer: NSObject {
         }
     }
     
-    var track: MYPlayerTrack! {
+    var track: ZYFPlayerTrack! {
         didSet {
             self.playerItem = nil
             self.avPlayer = nil
         }
     }
     
-    fileprivate var playerLayerView: MYPlayerLayerView?
+    fileprivate var playerLayerView: ZYFPlayerLayerView?
     
     fileprivate var timeObserver: Any? = nil {
         didSet {
@@ -176,7 +174,7 @@ class MYPlayer: NSObject {
     
     fileprivate var isEndToSeek = false
     
-    weak var delegate: MYPlayerDelegate?
+    weak var delegate: ZYFPlayerDelegate?
     
     var streamURL: URL? {
         didSet {
@@ -228,13 +226,13 @@ class MYPlayer: NSObject {
     var videoGravity: String? {
         get {
             if let view = self.playerLayerView {
-                return view.playerLayer.videoGravity
+                return view.playerLayer.videoGravity.rawValue
             }
            return nil
         }
         set {
             if newValue != nil {
-                self.playerLayerView?.playerLayer.videoGravity = newValue!
+                self.playerLayerView?.playerLayer.videoGravity = AVLayerVideoGravity(rawValue: newValue!)
             }
         }
     }
@@ -289,17 +287,17 @@ class MYPlayer: NSObject {
         return startSeconds + durationSeconds
     }
     
-    var state: MYPlayerState = .unkown {
+    var state: ZYFPlayerState = .unkown {
         didSet {
             guard let delegate = self.delegate else {
                 return
             }
-            if delegate.responds(to: #selector(MYPlayerDelegate.my_player(player:shouldChangeToState:))) {
-                if !delegate.my_player!(player: self, shouldChangeToState: oldValue) {
+            if delegate.responds(to: #selector(ZYFPlayerDelegate.zyf_player(player:shouldChangeToState:))) {
+                if !delegate.zyf_player!(player: self, shouldChangeToState: oldValue) {
                     return
                 }
             }
-            delegate.my_player?(player: self, track: self.track, willChangeToState: self.state, fromState: oldValue)
+            delegate.zyf_player?(player: self, track: self.track, willChangeToState: self.state, fromState: oldValue)
             if oldValue == self.state {
                 if !self.isPlaying && self.state == .playing {
                     self.avPlayer?.play()
@@ -309,11 +307,11 @@ class MYPlayer: NSObject {
             
             switch oldValue {
             case .loading:
-                NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(MYPlayer.urlAssetTimeOut), object: nil)
+                NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(ZYFPlayer.urlAssetTimeOut), object: nil)
             case .seeking:
-                NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(MYPlayer.seekingTimeOut), object: nil)
+                NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(ZYFPlayer.seekingTimeOut), object: nil)
             case .buffering:
-                NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(MYPlayer.bufferingTimeOut), object: nil)
+                NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(ZYFPlayer.bufferingTimeOut), object: nil)
             case .stopped:
                 if self.state == .playing {
                     return
@@ -328,15 +326,15 @@ class MYPlayer: NSObject {
                     self.avPlayer?.pause()
                 }
             case .loading:
-                self.perform(#selector(MYPlayer.urlAssetTimeOut), with: nil, afterDelay: kPlayerTimeOut)
+                self.perform(#selector(ZYFPlayer.urlAssetTimeOut), with: nil, afterDelay: kPlayerTimeOut)
                 break
             case .readToPlay:
                 self.track.hasVideoBeenLoadedBefore = true
             case .seeking:
-                self.perform(#selector(MYPlayer.seekingTimeOut), with: nil, afterDelay: kPlayerTimeOut)
+                self.perform(#selector(ZYFPlayer.seekingTimeOut), with: nil, afterDelay: kPlayerTimeOut)
                 break
             case .buffering:
-                self.perform(#selector(MYPlayer.bufferingTimeOut), with: nil, afterDelay: kPlayerTimeOut)
+                self.perform(#selector(ZYFPlayer.bufferingTimeOut), with: nil, afterDelay: kPlayerTimeOut)
             case .playing:
                 if !self.isPlaying{
                     self.avPlayer?.play()
@@ -346,7 +344,7 @@ class MYPlayer: NSObject {
             case .failed:
                 self.avPlayer?.pause()
                 self.saveLastWatchTimeWithOldState(oldState: oldValue)
-                self.notifyErrorCode(errorCode: MYPlayerErrorCode.playerFail, error: nil)
+                self.notifyErrorCode(errorCode: ZYFPlayerErrorCode.playerFail, error: nil)
             case .stopped:
                 self.cancelAllTimeOut()
                 self.playerItem?.cancelPendingSeeks()
@@ -357,15 +355,15 @@ class MYPlayer: NSObject {
             default:
                 break
             }
-            self.myLog(string: "currentState", item: self.state)
-            self.delegate?.my_player?(player: self, track: self.track, didChangeToState: self.state, fromState: oldValue)
+            self.ZYFLog(string: "currentState", item: self.state)
+            self.delegate?.zyf_player?(player: self, track: self.track, didChangeToState: self.state, fromState: oldValue)
         }
     }
     
     
     
     // MARK: - Object lifecycle
-    init(delegate: MYPlayerDelegate, playerLayerView: MYPlayerLayerView?) {
+    init(delegate: ZYFPlayerDelegate, playerLayerView: ZYFPlayerLayerView?) {
         super.init()
         self.playerLayerView = playerLayerView
         self.delegate = delegate
@@ -381,14 +379,14 @@ class MYPlayer: NSObject {
 }
 
 // MARK: - Load Video URL
-extension MYPlayer {
+extension ZYFPlayer {
     
-    func loadVideoWithStreamURL(streamURL: URL, playerLayerView: MYPlayerLayerView?=nil) {
-        let track = MYPlayerTrack(streamURL: streamURL)
+    func loadVideoWithStreamURL(streamURL: URL, playerLayerView: ZYFPlayerLayerView?=nil) {
+        let track = ZYFPlayerTrack(streamURL: streamURL)
         self.loadVideoWithTrack(track: track, playerLayerView: playerLayerView)
     }
     
-    func loadVideoWithTrack(track: MYPlayerTrack, playerLayerView: MYPlayerLayerView?=nil) {
+    func loadVideoWithTrack(track: ZYFPlayerTrack, playerLayerView: ZYFPlayerLayerView?=nil) {
         if self.state != .failed  || self.state != .unkown {
             self.stop()
         }
@@ -400,7 +398,7 @@ extension MYPlayer {
         self.reloadVideoTrack(track: track)
     }
     
-    func reloadVideoTrack(track: MYPlayerTrack) {
+    func reloadVideoTrack(track: ZYFPlayerTrack) {
         self.state = .requestURL
         switch self.state {
         case .requestURL:
@@ -427,7 +425,7 @@ extension MYPlayer {
         }
     }
     
-    fileprivate func playWithTrack(track: MYPlayerTrack) {
+    fileprivate func playWithTrack(track: ZYFPlayerTrack) {
         if !self.shouldPlayTrack(track: track) {
             return
         }
@@ -435,7 +433,7 @@ extension MYPlayer {
         self.getStreamURLWithTrack(track: track)
     }
     
-    fileprivate func getStreamURLWithTrack(track: MYPlayerTrack) {
+    fileprivate func getStreamURLWithTrack(track: ZYFPlayerTrack) {
         track.getStreamURL { [weak self] (url) in
             self?.playWithStreamURL(streamURL: url, playerLayerView: self?.playerLayerView)
         }
@@ -443,7 +441,7 @@ extension MYPlayer {
 }
 
 // MARK: - Play Video URL
-extension MYPlayer {
+extension ZYFPlayer {
     fileprivate func playWithStreamURL(streamURL: URL, playerLayerView: UIView?) {
         if self.state == .stopped {
             return
@@ -493,13 +491,13 @@ extension MYPlayer {
                     }
                 }else if status == .failed || status == .unknown {
                     self.state = .failed
-                    self.notifyErrorCode(errorCode: MYPlayerErrorCode.assetLoadError, error: error)
+                    self.notifyErrorCode(errorCode: ZYFPlayerErrorCode.assetLoadError, error: error)
                     return
                 }
                 
                 if !self.asset.isPlayable {
                     self.state = .failed
-                    self.notifyErrorCode(errorCode: MYPlayerErrorCode.assetLoadError, error: error)
+                    self.notifyErrorCode(errorCode: ZYFPlayerErrorCode.assetLoadError, error: error)
                     return
                 }
             })
@@ -508,7 +506,7 @@ extension MYPlayer {
 }
 
 // MARK: - Play lifecylce 
-extension MYPlayer {
+extension ZYFPlayer {
     
     func play() {
         if self.state == .loading || self.state == .unkown || (self.state == .playing && self.isPlaying) {
@@ -604,32 +602,32 @@ extension MYPlayer {
         self.avPlayer?.seek(to: CMTime(seconds: tiem, preferredTimescale: playerItem.currentTime().timescale), toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero, completionHandler: completion)
     }
     
-    fileprivate func saveLastWatchTimeWithOldState(oldState: MYPlayerState) {
+    fileprivate func saveLastWatchTimeWithOldState(oldState: ZYFPlayerState) {
         if oldState != .loading && oldState != .requestURL {
             self.track.lastTimeInSeconds = self.currentTime
             self.track.hasVideoBeenLoadedBefore = false
         }
     }
     
-    fileprivate func shouldPlayTrack(track: MYPlayerTrack) -> Bool {
+    fileprivate func shouldPlayTrack(track: ZYFPlayerTrack) -> Bool {
         guard let delegate = self.delegate else {
             return true
         }
-        if delegate.responds(to: #selector(MYPlayerDelegate.my_player(player:shouldPlayTrack:))) {
-            return delegate.my_player!(player: self, shouldPlayTrack: track)
+        if delegate.responds(to: #selector(ZYFPlayerDelegate.zyf_player(player:shouldPlayTrack:))) {
+            return delegate.zyf_player!(player: self, shouldPlayTrack: track)
         }else {
             return true
         }
     }
     
-    fileprivate func willPlayTrack(track: MYPlayerTrack) {
-        self.delegate?.my_player?(player: self, willPlayTrack: track)
+    fileprivate func willPlayTrack(track: ZYFPlayerTrack) {
+        self.delegate?.zyf_player?(player: self, willPlayTrack: track)
     }
     
-    fileprivate func notifyErrorCode(errorCode: MYPlayerErrorCode, error: Error?) {
+    fileprivate func notifyErrorCode(errorCode: ZYFPlayerErrorCode, error: Error?) {
         self.cancelAllTimeOut()
-        self.delegate?.my_player?(player: self, track: self.track, receivedErrorCode: errorCode, error: error)
-        self.myLog(string: "receivedErrorCode", item: errorCode)
+        self.delegate?.zyf_player?(player: self, track: self.track, receivedErrorCode: errorCode, error: error)
+        self.ZYFLog(string: "receivedErrorCode", item: errorCode)
     }
     
     func releasePlayer() {
@@ -639,23 +637,23 @@ extension MYPlayer {
 }
 
 // MARK: - Time Out
-extension MYPlayer {
+extension ZYFPlayer {
     @objc fileprivate func urlAssetTimeOut() {
-        self.notifyTimeOut(timeOut: MYPlayerTimeOut.load)
+        self.notifyTimeOut(timeOut: ZYFPlayerTimeOut.load)
     }
     
     @objc fileprivate func seekingTimeOut() {
-        self.notifyTimeOut(timeOut: MYPlayerTimeOut.seek)
+        self.notifyTimeOut(timeOut: ZYFPlayerTimeOut.seek)
     }
     
     @objc fileprivate func bufferingTimeOut() {
-        self.notifyTimeOut(timeOut: MYPlayerTimeOut.buffer)
+        self.notifyTimeOut(timeOut: ZYFPlayerTimeOut.buffer)
     }
     
-    @objc fileprivate func notifyTimeOut(timeOut: MYPlayerTimeOut) {
+    @objc fileprivate func notifyTimeOut(timeOut: ZYFPlayerTimeOut) {
         self.dispatch_main_async_safe { 
             self.avPlayer?.pause()
-            self.delegate?.my_player?(player: self, track: self.track, receivedTimeout: timeOut)
+            self.delegate?.zyf_player?(player: self, track: self.track, receivedTimeout: timeOut)
         }
     }
     
@@ -670,15 +668,15 @@ extension MYPlayer {
     }
     
     fileprivate func cancelAllTimeOut() {
-        NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(MYPlayer.urlAssetTimeOut), object: nil)
-        NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(MYPlayer.seekingTimeOut), object: nil)
-        NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(MYPlayer.bufferingTimeOut), object: nil)
+        NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(ZYFPlayer.urlAssetTimeOut), object: nil)
+        NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(ZYFPlayer.seekingTimeOut), object: nil)
+        NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(ZYFPlayer.bufferingTimeOut), object: nil)
     }
 }
 
 // MARK: - Add Remove Observers
 
-extension MYPlayer {
+extension ZYFPlayer {
     
     fileprivate func removeRouteObservers() {
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name.AVAudioSessionRouteChange, object: nil)
@@ -688,9 +686,9 @@ extension MYPlayer {
     fileprivate func addRouteObservers() {
         self.removeRouteObservers()
         
-        NotificationCenter.default.addObserver(self, selector: #selector(MYPlayer.routeChange(_:)), name: NSNotification.Name.AVAudioSessionRouteChange, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(ZYFPlayer.routeChange(_:)), name: NSNotification.Name.AVAudioSessionRouteChange, object: nil)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(MYPlayer.routeInterrypt(_:)), name: NSNotification.Name.AVAudioSessionInterruption, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(ZYFPlayer.routeInterrypt(_:)), name: NSNotification.Name.AVAudioSessionInterruption, object: nil)
         
     }
     
@@ -711,7 +709,7 @@ extension MYPlayer {
             }
             if strongSelf.state == .playing {
                 strongSelf.track.currentTime = timeInSeconds
-                strongSelf.delegate?.my_player?(player: strongSelf, track: strongSelf.track, didUpdateCurrentTime: timeInSeconds)
+                strongSelf.delegate?.zyf_player?(player: strongSelf, track: strongSelf.track, didUpdateCurrentTime: timeInSeconds)
             }
         })
     }
@@ -730,14 +728,14 @@ extension MYPlayer {
         playerItem.addObserver(self, forKeyPath: kPlayerBufferEmptyKey, options: ([.old, .new]), context: nil)
         playerItem.addObserver(self, forKeyPath: kPlayerLikelyTokeepUpKey, options: ([.old, .new]), context: nil)
         playerItem.addObserver(self, forKeyPath: kPlayerLoadedTimeRangesKey, options: ([.new, .old]), context: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(MYPlayer.playerItemDidPlayToEndTime(_:)), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: playerItem)
-        NotificationCenter.default.addObserver(self, selector: #selector(MYPlayer.playerItemFailedPlayToEndTime(_:)), name: NSNotification.Name.AVPlayerItemFailedToPlayToEndTime, object: playerItem)
+        NotificationCenter.default.addObserver(self, selector: #selector(ZYFPlayer.playerItemDidPlayToEndTime(_:)), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: playerItem)
+        NotificationCenter.default.addObserver(self, selector: #selector(ZYFPlayer.playerItemFailedPlayToEndTime(_:)), name: NSNotification.Name.AVPlayerItemFailedToPlayToEndTime, object: playerItem)
     }
 }
 
 // MARK: - KVO
 
-extension MYPlayer {
+extension ZYFPlayer {
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         if self.avPlayer == object as? AVPlayer {
             if keyPath == kPlayerStatusKey {
@@ -746,7 +744,7 @@ extension MYPlayer {
                     self.state = .readToPlay
                 case .some(.failed):
                     self.state = .failed
-                    self.notifyErrorCode(errorCode: MYPlayerErrorCode.playerFail, error: self.avPlayer?.error)
+                    self.notifyErrorCode(errorCode: ZYFPlayerErrorCode.playerFail, error: self.avPlayer?.error)
                 default:
                     break
                 }
@@ -776,7 +774,7 @@ extension MYPlayer {
                     self.state = .readToPlay
                 case .failed:
                     self.state = .failed
-                    self.notifyErrorCode(errorCode: MYPlayerErrorCode.playerItemFail, error: playerItem.error)
+                    self.notifyErrorCode(errorCode: ZYFPlayerErrorCode.playerItemFail, error: playerItem.error)
                 default:
                     break
                 }
@@ -789,7 +787,7 @@ extension MYPlayer {
                     let timeRange: CMTimeRange = timeRanges[0].timeRangeValue
                     let bufferedTime = CMTimeGetSeconds(CMTimeAdd(timeRange.start, timeRange.duration))
                     
-                    self.delegate?.my_player?(player: self, track: self.track, didUpdateBufferTime: bufferedTime)
+                    self.delegate?.zyf_player?(player: self, track: self.track, didUpdateBufferTime: bufferedTime)
                 }
             }
         }
@@ -798,7 +796,7 @@ extension MYPlayer {
 
 // MARK: - Notifications
 
-extension MYPlayer {
+extension ZYFPlayer {
     
     @objc fileprivate func playerItemDidPlayToEndTime(_ notification: Notification) {
         self.track.isPlayedToEnd = true
@@ -806,13 +804,13 @@ extension MYPlayer {
             guard let strongSelf = self else {
                 return
             }
-            strongSelf.delegate?.my_player?(player: strongSelf, didEndToPlayTrack: strongSelf.track)
+            strongSelf.delegate?.zyf_player?(player: strongSelf, didEndToPlayTrack: strongSelf.track)
         }
     }
     
     @objc fileprivate func playerItemFailedPlayToEndTime(_ notification: Notification) {
         let error = notification.userInfo?[AVPlayerItemFailedToPlayToEndTimeErrorKey] as? Error
-        self.notifyErrorCode(errorCode: MYPlayerErrorCode.playerItemEndFail, error: error)
+        self.notifyErrorCode(errorCode: ZYFPlayerErrorCode.playerItemEndFail, error: error)
     }
     
     @objc fileprivate func routeChange(_ notification: Notification) {
@@ -824,8 +822,8 @@ extension MYPlayer {
     }
 }
 
-extension MYPlayer {
-    func myLog(string: String, item: Any) {
+extension ZYFPlayer {
+    func ZYFLog(string: String, item: Any) {
         print("************************  \(string):  \(item)")
     }
 }

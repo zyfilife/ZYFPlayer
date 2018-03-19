@@ -1,6 +1,6 @@
 //
-//  MYPlayerLayerView.swift
-//  MYPlayerDemo
+//  ZYFPlayerLayerView.swift
+//  ZYFPlayerExample
 //
 //  Created by 朱益锋 on 2017/1/24.
 //  Copyright © 2017年 朱益锋. All rights reserved.
@@ -9,7 +9,7 @@
 import UIKit
 import AVFoundation
 
-class MYPlayerLayerView: UIView {
+class ZYFPlayerLayerView: UIView {
     
     var player: AVPlayer? {
         get {

@@ -1,6 +1,6 @@
 //
-//  MYPlayerTrack.swift
-//  MYPlayerDemo
+//  ZYFPlayerTrack.swift
+//  ZYFPlayerExample
 //
 //  Created by 朱益锋 on 2017/1/24.
 //  Copyright © 2017年 朱益锋. All rights reserved.
@@ -8,15 +8,15 @@
 
 import UIKit
 
-enum MYPlayerResourceType: Int {
+enum ZYFPlayerResourceType: Int {
     case vod = 0
     case live
     case local
 }
 
-class MYPlayerTrack: NSObject {
+class ZYFPlayerTrack: NSObject {
     
-    var resourceType: MYPlayerResourceType = .vod
+    var resourceType: ZYFPlayerResourceType = .vod
     var streamURL: URL
     var isPlayedToEnd = false
     var hasVideoBeenLoadedBefore = false

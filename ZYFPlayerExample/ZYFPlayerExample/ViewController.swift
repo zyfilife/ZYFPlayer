@@ -1,16 +1,16 @@
 //
 //  ViewController.swift
-//  MYPlayerDemo
+//  ZYFPlayerExample
 //
-//  Created by 朱益锋 on 2017/1/24.
-//  Copyright © 2017年 朱益锋. All rights reserved.
+//  Created by 朱益锋 on 2018/3/19.
+//  Copyright © 2018年 com.zhuyifeng. All rights reserved.
 //
 
 import UIKit
 
-class ViewController: UIViewController, MYPlayerViewDelegate {
+class ViewController: UIViewController, ZYFPlayerViewDelegate {
     
-    var playerView: MYPlayerView?
+    var playerView: ZYFPlayerView?
     
     var isHiddenStatusBar: Bool = false
     
@@ -24,15 +24,15 @@ class ViewController: UIViewController, MYPlayerViewDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        let url = URL(string: "http://baobab.wdjcdn.com/1456117847747a_x264.mp4")
-        self.playerView = MYPlayerView(streamURL: url, delegate: self)
+        let url = URL(string: "http://xy-smartplayer-rec.oss-cn-hangzhou.aliyuncs.com/video/course/%E6%B5%B7%E4%BC%A6-%E7%BB%B4%E4%B9%9F%E7%BA%B3%E9%9F%B3%E4%B9%90%E4%B9%8B%E6%97%85%EF%BC%88%E4%BA%9A%E9%87%87%E5%85%8B%C2%B7%E7%A7%91%E5%B0%94%E5%A1%94%E6%96%AF%EF%BC%89.mp4")
+        self.playerView = ZYFPlayerView(streamURL: url, delegate: self)
         self.view.addSubview(self.playerView!)
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
-
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         self.playerView?.frame = self.view.bounds
@@ -47,21 +47,21 @@ class ViewController: UIViewController, MYPlayerViewDelegate {
         NotificationCenter.default.removeObserver(self)
     }
     
-    func my_player(playerView: MYPlayerView, didClickPlayButton sender: UIButton) {
+    func zyf_player(playerView: ZYFPlayerView, didClickPlayButton sender: UIButton) {
         
     }
     
-    func my_player(playerView: MYPlayerView, didClickCloseButton sender: UIButton) {
+    func zyf_player(playerView: ZYFPlayerView, didClickCloseButton sender: UIButton) {
         self.dismiss(animated: true, completion: nil)
     }
     
-    func my_player(playerView: MYPlayerView, didClickFullScreenButton sender: UIButton) {
+    func zyf_player(playerView: ZYFPlayerView, didClickFullScreenButton sender: UIButton) {
     }
     
-    func my_player(playerView: MYPlayerView, didChangeControlViewDisplay isHiddenControlView: Bool) {
+    func zyf_player(playerView: ZYFPlayerView, didChangeControlViewDisplay isHiddenControlView: Bool) {
         self.isHiddenStatusBar = isHiddenControlView
         self.setNeedsStatusBarAppearanceUpdate()
     }
-
+    
 }
 

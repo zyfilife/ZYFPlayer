@@ -1,9 +1,9 @@
 //
 //  AppDelegate.swift
-//  MYPlayerDemo
+//  ZYFPlayerExample
 //
-//  Created by 朱益锋 on 2017/1/24.
-//  Copyright © 2017年 朱益锋. All rights reserved.
+//  Created by 朱益锋 on 2018/3/19.
+//  Copyright © 2018年 com.zhuyifeng. All rights reserved.
 //
 
 import UIKit
@@ -15,7 +15,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        
         // Override point for customization after application launch.
         return true
     }

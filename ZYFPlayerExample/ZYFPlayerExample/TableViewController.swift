@@ -1,9 +1,9 @@
 //
 //  TableViewController.swift
-//  MYPlayerDemo
+//  ZYFPlayerExample
 //
-//  Created by 朱益锋 on 2017/1/26.
-//  Copyright © 2017年 朱益锋. All rights reserved.
+//  Created by 朱益锋 on 2018/3/19.
+//  Copyright © 2018年 com.zhuyifeng. All rights reserved.
 //
 
 import UIKit
@@ -17,15 +17,14 @@ class TableViewController: UITableViewController {
         // self.clearsSelectionOnViewWillAppear = false
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem()
+        // self.navigationItem.rightBarButtonItem = self.editButtonItem
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-
-    // MARK: - Table view data source
+    
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let viewController = ViewController()
         self.present(viewController, animated: true, completion: nil)

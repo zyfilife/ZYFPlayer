@@ -1,6 +1,6 @@
 //
-//  MYPlayerTopView.swift
-//  MYPlayerDemo
+//  ZYFPlayerTopView.swift
+//  ZYFPlayerExample
 //
 //  Created by 朱益锋 on 2017/1/26.
 //  Copyright © 2017年 朱益锋. All rights reserved.
@@ -8,19 +8,19 @@
 
 import UIKit
 
-class MYPlayerTopView: UIView {
+class ZYFPlayerTopView: UIView {
     
-    var didClickCloseButtonActionHandler: MYPlayerClickButtonActionBlock?
+    var didClickCloseButtonActionHandler: ZYFPlayerClickButtonActionBlock?
 
     lazy var closeButton: UIButton = {
         let button = UIButton(type: UIButtonType.custom)
-        button.setImage(UIImage.my_image(named: "ba_back"), for: UIControlState.normal)
-        button.addTarget(self, action: #selector(MYPlayerTopView.clickCloseButtonAction(_:)), for: UIControlEvents.touchUpInside)
+        button.setImage(UIImage.zyf_image(named: "ba_back"), for: UIControlState.normal)
+        button.addTarget(self, action: #selector(ZYFPlayerTopView.clickCloseButtonAction(_:)), for: UIControlEvents.touchUpInside)
         return button
     }()
     
     lazy var backgroundView: UIImageView = {
-        return UIImageView(image: UIImage.my_image(named: "top_shadow"))
+        return UIImageView(image: UIImage.zyf_image(named: "top_shadow"))
     }()
     
     override init(frame: CGRect) {
@@ -44,7 +44,7 @@ class MYPlayerTopView: UIView {
         self.closeButton.center.y = self.frame.size.height/2 + 20/2
     }
     
-    func clickCloseButtonAction(_ sender: UIButton) {
+    @objc func clickCloseButtonAction(_ sender: UIButton) {
         self.didClickCloseButtonActionHandler?(sender)
     }
 

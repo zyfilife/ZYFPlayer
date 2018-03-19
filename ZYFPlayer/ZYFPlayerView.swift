@@ -1,6 +1,6 @@
 //
-//  MYPlayerView.swift
-//  MYPlayerDemo
+//  ZYFPlayerView.swift
+//  ZYFPlayerExample
 //
 //  Created by 朱益锋 on 2017/1/24.
 //  Copyright © 2017年 朱益锋. All rights reserved.
@@ -9,16 +9,16 @@
 import UIKit
 import AVFoundation
 
-protocol MYPlayerViewDelegate: NSObjectProtocol {
-    func my_player(playerView: MYPlayerView, didClickPlayButton sender: UIButton)
-    func my_player(playerView: MYPlayerView, didClickCloseButton sender: UIButton)
-    func my_player(playerView: MYPlayerView, didClickFullScreenButton sender: UIButton)
-    func my_player(playerView: MYPlayerView, didChangeControlViewDisplay isHiddenControlView: Bool)
+protocol ZYFPlayerViewDelegate: NSObjectProtocol {
+    func zyf_player(playerView: ZYFPlayerView, didClickPlayButton sender: UIButton)
+    func zyf_player(playerView: ZYFPlayerView, didClickCloseButton sender: UIButton)
+    func zyf_player(playerView: ZYFPlayerView, didClickFullScreenButton sender: UIButton)
+    func zyf_player(playerView: ZYFPlayerView, didChangeControlViewDisplay isHiddenControlView: Bool)
 }
 
-class MYPlayerView: UIView, MYPlayerDelegate {
+class ZYFPlayerView: UIView, ZYFPlayerDelegate {
     
-    fileprivate var player: MYPlayer?
+    fileprivate var player: ZYFPlayer?
     
     fileprivate var isSliderDraging = false
     
@@ -65,7 +65,7 @@ class MYPlayerView: UIView, MYPlayerDelegate {
                 }, completion: { (finished) in
                 })
             }
-            self.delegate.my_player(playerView: self, didChangeControlViewDisplay: newValue)
+            self.delegate.zyf_player(playerView: self, didChangeControlViewDisplay: newValue)
         }
     }
     
@@ -97,10 +97,10 @@ class MYPlayerView: UIView, MYPlayerDelegate {
     
     var lastOrientation: UIDeviceOrientation!
     
-    weak var delegate: MYPlayerViewDelegate!
+    weak var delegate: ZYFPlayerViewDelegate!
     
-    lazy var playerLayerView: MYPlayerLayerView = {
-        let layerView = MYPlayerLayerView()
+    lazy var playerLayerView: ZYFPlayerLayerView = {
+        let layerView = ZYFPlayerLayerView()
         return layerView
     }()
     
@@ -108,24 +108,24 @@ class MYPlayerView: UIView, MYPlayerDelegate {
         return UIView()
     }()
     
-    lazy var bottomView: MYPlayerBottomView = {
-        return MYPlayerBottomView()
+    lazy var bottomView: ZYFPlayerBottomView = {
+        return ZYFPlayerBottomView()
     }()
     
-    lazy var loadingView: MYLoadingView = {
-        return MYLoadingView()
+    lazy var loadingView: ZYFLoadingView = {
+        return ZYFLoadingView()
     }()
     
-    lazy var topView: MYPlayerTopView = {
-        return MYPlayerTopView()
+    lazy var topView: ZYFPlayerTopView = {
+        return ZYFPlayerTopView()
     }()
     
-    lazy var errorView: MYPlayerErrorView = {
-        return MYPlayerErrorView()
+    lazy var errorView: ZYFPlayerErrorView = {
+        return ZYFPlayerErrorView()
     }()
     
 
-    init(streamURL: URL?, delegate: MYPlayerViewDelegate) {
+    init(streamURL: URL?, delegate: ZYFPlayerViewDelegate) {
         super.init(frame: CGRect.zero)
         self.delegate = delegate
         self.backgroundColor = .black
@@ -134,7 +134,7 @@ class MYPlayerView: UIView, MYPlayerDelegate {
         self.addSubview(self.loadingView)
         self.addSubview(self.topView)
         self.addSubview(self.errorView)
-        let tap = UITapGestureRecognizer(target: self, action: #selector(MYPlayerView.singleTapPlayerView(_:)))
+        let tap = UITapGestureRecognizer(target: self, action: #selector(ZYFPlayerView.singleTapPlayerView(_:)))
         self.addGestureRecognizer(tap)
         self.bottomView.didClickPlayButtonActionHandler = { [weak self] (sender) -> Void in
             guard let strongSelf = self else {
@@ -146,7 +146,7 @@ class MYPlayerView: UIView, MYPlayerDelegate {
             }else {
                 strongSelf.player?.pause()
             }
-            strongSelf.delegate?.my_player(playerView: strongSelf, didClickPlayButton: sender)
+            strongSelf.delegate?.zyf_player(playerView: strongSelf, didClickPlayButton: sender)
         }
         self.bottomView.didClickFullScreenButtonActionHandler = { [weak self] (sender) -> Void in
             guard let strongSelf = self else {
@@ -161,7 +161,7 @@ class MYPlayerView: UIView, MYPlayerDelegate {
                 strongSelf.toOrientation(orientation: UIInterfaceOrientation.portrait)
                 strongSelf.isFullScreen = false
             }
-            strongSelf.delegate?.my_player(playerView: strongSelf, didClickFullScreenButton: sender)
+            strongSelf.delegate?.zyf_player(playerView: strongSelf, didClickFullScreenButton: sender)
         }
         self.bottomView.didStartDragSliderActionHandler = { [weak self] (sender) -> Void in
             guard let strongSelf = self, let player = self?.player else {
@@ -231,7 +231,7 @@ class MYPlayerView: UIView, MYPlayerDelegate {
             }else {
                 strongSelf.stop()
                 strongSelf.removeTimer()
-                strongSelf.delegate.my_player(playerView: strongSelf, didClickCloseButton: sender)
+                strongSelf.delegate.zyf_player(playerView: strongSelf, didClickCloseButton: sender)
             }
             
         }
@@ -252,12 +252,12 @@ class MYPlayerView: UIView, MYPlayerDelegate {
             }
             strongSelf.removeTimer()
         }
-        self.player = MYPlayer(delegate: self, playerLayerView: self.playerLayerView)
+        self.player = ZYFPlayer(delegate: self, playerLayerView: self.playerLayerView)
         self.player?.streamURL = streamURL
-        self.player?.videoGravity = AVLayerVideoGravityResizeAspect
+        self.player?.videoGravity = AVLayerVideoGravity.resizeAspect.rawValue
         
         self.lastOrientation = UIDevice.current.orientation
-        NotificationCenter.default.addObserver(self, selector: #selector(MYPlayerView.deviceOrientationDidChanged(_:)), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(ZYFPlayerView.deviceOrientationDidChanged(_:)), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -287,7 +287,7 @@ class MYPlayerView: UIView, MYPlayerDelegate {
     fileprivate func addTimerToAutoHideControlView() {
         self.removeTimer()
         if !self.isHiddenControlView {
-            self.timer = Timer.scheduledTimer(timeInterval: 5, target: self, selector: #selector(MYPlayerView.autoHideControlView(_:)), userInfo: nil, repeats: false)
+            self.timer = Timer.scheduledTimer(timeInterval: 5, target: self, selector: #selector(ZYFPlayerView.autoHideControlView(_:)), userInfo: nil, repeats: false)
             RunLoop.current.add(self.timer!, forMode: RunLoopMode.commonModes)
         }
     }
@@ -346,7 +346,7 @@ class MYPlayerView: UIView, MYPlayerDelegate {
         }
     }
     
-    internal func my_player(player: MYPlayer, track: MYPlayerTrack, didChangeToState toState: MYPlayerState, fromState: MYPlayerState) {
+    internal func zyf_player(player: ZYFPlayer, track: ZYFPlayerTrack, didChangeToState toState: ZYFPlayerState, fromState: ZYFPlayerState) {
         
         switch toState {
         case .playing, .paused, .readToPlay, .stopped, .failed:
@@ -387,11 +387,11 @@ class MYPlayerView: UIView, MYPlayerDelegate {
         }
     }
     
-    internal func my_player(player: MYPlayer, track: MYPlayerTrack, didUpdateBufferTime bufferTime: TimeInterval) {
+    internal func zyf_player(player: ZYFPlayer, track: ZYFPlayerTrack, didUpdateBufferTime bufferTime: TimeInterval) {
         self.bottomView.bufferProgress = Float(bufferTime/player.maximumDuration)
     }
     
-    internal func my_player(player: MYPlayer, track: MYPlayerTrack, didUpdateCurrentTime currentTime: TimeInterval) {
+    internal func zyf_player(player: ZYFPlayer, track: ZYFPlayerTrack, didUpdateCurrentTime currentTime: TimeInterval) {
         if self.isSliderDraging {
             return
         }
@@ -399,7 +399,7 @@ class MYPlayerView: UIView, MYPlayerDelegate {
         self.bottomView.playProgress = Float(currentTime/player.maximumDuration)
     }
     
-    internal func my_player(player: MYPlayer, track: MYPlayerTrack, receivedTimeout timeOut: MYPlayerTimeOut) {
+    internal func zyf_player(player: ZYFPlayer, track: ZYFPlayerTrack, receivedTimeout timeOut: ZYFPlayerTimeOut) {
         self.loadingView.stopAnimating()
         self.isHiddenControlViewForced = false
         self.errorView.title = "重试"
@@ -409,7 +409,7 @@ class MYPlayerView: UIView, MYPlayerDelegate {
         }
     }
     
-    internal func my_player(player: MYPlayer, didEndToPlayTrack track: MYPlayerTrack) {
+    internal func zyf_player(player: ZYFPlayer, didEndToPlayTrack track: ZYFPlayerTrack) {
         self.isHiddenControlViewForced = true
         self.errorView.title = "重播"
         self.errorView.eventType = .replay
@@ -418,23 +418,23 @@ class MYPlayerView: UIView, MYPlayerDelegate {
         }
     }
     
-    internal func my_player(player: MYPlayer, shouldPlayTrack track: MYPlayerTrack) -> Bool {
+    internal func zyf_player(player: ZYFPlayer, shouldPlayTrack track: ZYFPlayerTrack) -> Bool {
         return true
     }
     
-    internal func my_player(player: MYPlayer, shouldChangeToState toState: MYPlayerState) -> Bool {
+    internal func zyf_player(player: ZYFPlayer, shouldChangeToState toState: ZYFPlayerState) -> Bool {
         return true
     }
     
-    internal func my_player(player: MYPlayer, track: MYPlayerTrack, willChangeToState toState: MYPlayerState, fromState: MYPlayerState) {
+    internal func zyf_player(player: ZYFPlayer, track: ZYFPlayerTrack, willChangeToState toState: ZYFPlayerState, fromState: ZYFPlayerState) {
         
     }
     
-    internal func my_player(player: MYPlayer, willPlayTrack track: MYPlayerTrack) {
+    internal func zyf_player(player: ZYFPlayer, willPlayTrack track: ZYFPlayerTrack) {
         
     }
     
-    internal func my_player(player: MYPlayer, track: MYPlayerTrack, receivedErrorCode errorCode: MYPlayerErrorCode, error: Error?) {
+    internal func zyf_player(player: ZYFPlayer, track: ZYFPlayerTrack, receivedErrorCode errorCode: ZYFPlayerErrorCode, error: Error?) {
         self.errorView.title = "重试"
         self.errorView.eventType = .tryToAgain
         UIView.animate(withDuration: 0.03) {

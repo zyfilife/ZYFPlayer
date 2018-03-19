@@ -1,6 +1,6 @@
 //
-//  MYLoadingView.swift
-//  MYPlayerDemo
+//  ZYFLoadingView.swift
+//  ZYFPlayerExample
 //
 //  Created by 朱益锋 on 2017/1/25.
 //  Copyright © 2017年 朱益锋. All rights reserved.
@@ -8,7 +8,7 @@
 
 import UIKit
 
-class MYLoadingView: UIView {
+class ZYFLoadingView: UIView {
     
     var lineWidth:CGFloat!
     
@@ -90,7 +90,7 @@ class MYLoadingView: UIView {
         self.isAnimating = true
         self.anglePer = 0.0
         self.alpha = 1.0
-        self.displayerLink = CADisplayLink(target: self, selector: #selector(MYLoadingView.drawPathAnimation(_:)))
+        self.displayerLink = CADisplayLink(target: self, selector: #selector(ZYFLoadingView.drawPathAnimation(_:)))
         self.displayerLink?.add(to: RunLoop.current, forMode: RunLoopMode.commonModes)
     }
     

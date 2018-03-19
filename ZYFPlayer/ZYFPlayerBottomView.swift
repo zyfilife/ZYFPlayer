@@ -1,6 +1,6 @@
 //
-//  MYPlayerBottomView.swift
-//  MYPlayerDemo
+//  ZYFPlayerBottomView.swift
+//  ZYFPlayerExample
 //
 //  Created by 朱益锋 on 2017/1/24.
 //  Copyright © 2017年 朱益锋. All rights reserved.
@@ -8,21 +8,21 @@
 
 import UIKit
 
-typealias MYPlayerClickButtonActionBlock = (_ sender: UIButton) -> Void
-typealias MYPlayerDragSliderActionBlock = (_ sender: UISlider) -> Void
-typealias MYPlayerTouchSliderActionBlock = (_ progress: Float) -> Void
+typealias ZYFPlayerClickButtonActionBlock = (_ sender: UIButton) -> Void
+typealias ZYFPlayerDragSliderActionBlock = (_ sender: UISlider) -> Void
+typealias ZYFPlayerTouchSliderActionBlock = (_ progress: Float) -> Void
 
-class MYPlayerBottomView: UIView {
+class ZYFPlayerBottomView: UIView {
     
-    var didClickPlayButtonActionHandler: MYPlayerClickButtonActionBlock?
+    var didClickPlayButtonActionHandler: ZYFPlayerClickButtonActionBlock?
     
-    var didClickFullScreenButtonActionHandler: MYPlayerClickButtonActionBlock?
+    var didClickFullScreenButtonActionHandler: ZYFPlayerClickButtonActionBlock?
     
-    var didStartDragSliderActionHandler: MYPlayerDragSliderActionBlock?
-    var didDragingSliderActionHandler: MYPlayerDragSliderActionBlock?
-    var didEndDragSliderActionHandler: MYPlayerDragSliderActionBlock?
+    var didStartDragSliderActionHandler: ZYFPlayerDragSliderActionBlock?
+    var didDragingSliderActionHandler: ZYFPlayerDragSliderActionBlock?
+    var didEndDragSliderActionHandler: ZYFPlayerDragSliderActionBlock?
     
-    var didTouchSliderActionHandler: MYPlayerTouchSliderActionBlock?
+    var didTouchSliderActionHandler: ZYFPlayerTouchSliderActionBlock?
     
     var isDraging = false
     
@@ -100,17 +100,17 @@ class MYPlayerBottomView: UIView {
     
     lazy var playButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage.my_image(named: "play"), for: UIControlState.normal)
-        button.setImage(UIImage.my_image(named: "pause"), for: UIControlState.selected)
-        button.addTarget(self, action: #selector(MYPlayerBottomView.clickPlayButtonAction(_:)), for: UIControlEvents.touchUpInside)
+        button.setImage(UIImage.zyf_image(named: "play"), for: UIControlState.normal)
+        button.setImage(UIImage.zyf_image(named: "pause"), for: UIControlState.selected)
+        button.addTarget(self, action: #selector(ZYFPlayerBottomView.clickPlayButtonAction(_:)), for: UIControlEvents.touchUpInside)
         return button
     }()
     
     lazy var fullScreenButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage.my_image(named: "fullscreen"), for: UIControlState.normal)
-        button.setImage(UIImage.my_image(named: "nonfullscreen"), for: UIControlState.selected)
-        button.addTarget(self, action: #selector(MYPlayerBottomView.clickFullScreenButtonAction(_:)), for: UIControlEvents.touchUpInside)
+        button.setImage(UIImage.zyf_image(named: "fullscreen"), for: UIControlState.normal)
+        button.setImage(UIImage.zyf_image(named: "nonfullscreen"), for: UIControlState.selected)
+        button.addTarget(self, action: #selector(ZYFPlayerBottomView.clickFullScreenButtonAction(_:)), for: UIControlEvents.touchUpInside)
         return button
     }()
     
@@ -125,20 +125,20 @@ class MYPlayerBottomView: UIView {
         let slider = UISlider()
         slider.minimumValue = 0.0
         slider.maximumValue = 1.0
-        slider.setThumbImage(UIImage.my_image(named: "dot"), for: UIControlState.normal)
+        slider.setThumbImage(UIImage.zyf_image(named: "dot"), for: UIControlState.normal)
         slider.minimumTrackTintColor = .green
         slider.maximumTrackTintColor = UIColor(white: 0.5, alpha: 0.5)
         slider.value = 0.0
-        slider.addTarget(self, action: #selector(MYPlayerBottomView.sliderTouchDownAction(_:)), for: UIControlEvents.touchDown)
-        slider.addTarget(self, action: #selector(MYPlayerBottomView.sliderDragAction(_:)), for: UIControlEvents.valueChanged)
-        slider.addTarget(self, action: #selector(MYPlayerBottomView.sliderTouchUpAction(_:)), for: [.touchUpOutside,.touchUpInside])
-        let tap = UITapGestureRecognizer(target: self, action: #selector(MYPlayerBottomView.clickProgressSliderAction(_:)))
+        slider.addTarget(self, action: #selector(ZYFPlayerBottomView.sliderTouchDownAction(_:)), for: UIControlEvents.touchDown)
+        slider.addTarget(self, action: #selector(ZYFPlayerBottomView.sliderDragAction(_:)), for: UIControlEvents.valueChanged)
+        slider.addTarget(self, action: #selector(ZYFPlayerBottomView.sliderTouchUpAction(_:)), for: [.touchUpOutside,.touchUpInside])
+        let tap = UITapGestureRecognizer(target: self, action: #selector(ZYFPlayerBottomView.clickProgressSliderAction(_:)))
         slider.addGestureRecognizer(tap)
         return slider
     }()
     
     lazy var backgroundView: UIImageView = {
-        return UIImageView(image: UIImage.my_image(named: "bottom_shadow"))
+        return UIImageView(image: UIImage.zyf_image(named: "bottom_shadow"))
     }()
     
     override init(frame: CGRect) {
@@ -187,35 +187,35 @@ class MYPlayerBottomView: UIView {
         self.totalTimeLabel.frame.origin.x = self.frame.size.width-self.totalTimeLabel.frame.size.width-self.fullScreenButton.frame.size.width
     }
     
-    func clickPlayButtonAction(_ sender: UIButton) {
+    @objc func clickPlayButtonAction(_ sender: UIButton) {
         self.isPlaying = !self.isPlaying
         self.didClickPlayButtonActionHandler?(sender)
     }
     
-    func clickFullScreenButtonAction(_ sender: UIButton) {
+    @objc func clickFullScreenButtonAction(_ sender: UIButton) {
         self.didClickFullScreenButtonActionHandler?(sender)
     }
     
-    func sliderTouchDownAction(_ sender: UISlider) {
+    @objc func sliderTouchDownAction(_ sender: UISlider) {
         self.didStartDragSliderActionHandler?(sender)
     }
     
-    func sliderDragAction(_ sender: UISlider) {
+    @objc func sliderDragAction(_ sender: UISlider) {
         self.didDragingSliderActionHandler?(sender)
     }
     
-    func sliderTouchUpAction(_ sender: UISlider) {
+    @objc func sliderTouchUpAction(_ sender: UISlider) {
         self.didEndDragSliderActionHandler?(sender)
     }
     
-    func clickProgressSliderAction(_ sender: UITapGestureRecognizer) {
+    @objc func clickProgressSliderAction(_ sender: UITapGestureRecognizer) {
         let point = sender.location(in: self.progressSlider)
         let progress = point.x / self.progressSlider.frame.size.width
         self.didTouchSliderActionHandler?(Float(progress))
     }
 }
 
-extension MYPlayerBottomView {
+extension ZYFPlayerBottomView {
     internal func string(time: TimeInterval) -> String {
         let date = Date(timeIntervalSince1970: time)
         let formatter = DateFormatter()
@@ -230,7 +230,7 @@ extension MYPlayerBottomView {
 
 extension UIImage {
     
-    class func my_image(named: String) -> UIImage? {
-        return UIImage(named: "MYPlayer.bundle/\(named)")
+    class func zyf_image(named: String) -> UIImage? {
+        return UIImage(named: "ZYFPlayer.bundle/\(named)")
     }
 }

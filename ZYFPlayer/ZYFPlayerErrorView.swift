@@ -1,6 +1,6 @@
 //
-//  MYPlayerErrorView.swift
-//  MYPlayerDemo
+//  ZYFPlayerErrorView.swift
+//  ZYFPlayerExample
 //
 //  Created by 朱益锋 on 2017/1/26.
 //  Copyright © 2017年 朱益锋. All rights reserved.
@@ -8,18 +8,18 @@
 
 import UIKit
 
-enum MYPlayerEventType {
+enum ZYFPlayerEventType {
     case replay
     case tryToAgain
     case noAction
 }
 
-class MYPlayerErrorView: UIView {
+class ZYFPlayerErrorView: UIView {
     
     let widthOfErrorView: CGFloat = 80
     let heightOfErrorView: CGFloat = 80
     
-    var didClickErrorButtonActionHandler: ((_ eventType: MYPlayerEventType) -> Void)?
+    var didClickErrorButtonActionHandler: ((_ eventType: ZYFPlayerEventType) -> Void)?
     
     var title: String? {
         get {
@@ -30,12 +30,12 @@ class MYPlayerErrorView: UIView {
         }
     }
     
-    var eventType: MYPlayerEventType = .replay
+    var eventType: ZYFPlayerEventType = .replay
 
     lazy var errorButton: UIButton = {
         let button = UIButton(type: UIButtonType.custom)
-        button.setImage(UIImage.my_image(named: "replay"), for: UIControlState.normal)
-        button.addTarget(self, action: #selector(MYPlayerErrorView.clickErrorButtonAction(_:)), for: UIControlEvents.touchUpInside)
+        button.setImage(UIImage.zyf_image(named: "replay"), for: UIControlState.normal)
+        button.addTarget(self, action: #selector(ZYFPlayerErrorView.clickErrorButtonAction(_:)), for: UIControlEvents.touchUpInside)
         return button
     }()
     
@@ -70,7 +70,7 @@ class MYPlayerErrorView: UIView {
         return CGSize(width: self.widthOfErrorView, height: self.heightOfErrorView)
     }
     
-    func clickErrorButtonAction(_ sender: UIButton) {
+    @objc func clickErrorButtonAction(_ sender: UIButton) {
         self.didClickErrorButtonActionHandler?(self.eventType)
     }
     
